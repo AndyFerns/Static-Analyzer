@@ -15,7 +15,7 @@
 #define MAX_LINE_LENGTH 1024
 
 // file scanning logic
-void scan_file(const char* filepath) {
+void scan_file(const char* filepath, Warning* warnings, int* warning_count) {
     FILE* file = fopen(filepath, "r");
     if (!file) {
         printf(RED "[ERROR]" RESET " Could not open file: %s\n", filepath);
@@ -34,14 +34,24 @@ void scan_file(const char* filepath) {
                        line_number,
                        insecure_patterns[i][0],
                        insecure_patterns[i][1]);
+
+                // warning count flagging
+                if (*warning_count < 1000) {
+                    strcpy(warnings[*warning_count].file, filepath);
+                    warnings[*warning_count].line = line_number;
+                    strcpy(warnings[*warning_count].pattern, insecure_patterns[i][0]);
+                    strcpy(warnings[*warning_count].message, insecure_patterns[i][1]);
+                    (*warning_count)++;
+                }
             }
         }
     }
+
     fclose(file);
 }
 
 // directory scanning logic
-void scan_directory_recursive(const char* path) {
+void scan_directory_recursive(const char* path, Warning* warnings, int* warning_count) {
     DIR* dir = opendir(path);
     if (!dir) {
         perror("opendir() error");
@@ -52,7 +62,6 @@ void scan_directory_recursive(const char* path) {
     while ((entry = readdir(dir)) != NULL) {
         const char* name = entry->d_name;
 
-        // Skip . and ..
         if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
             continue;
 
@@ -62,12 +71,11 @@ void scan_directory_recursive(const char* path) {
         struct stat st;
         if (stat(fullpath, &st) == 0) {
             if (S_ISDIR(st.st_mode)) {
-                // Recurse into subdirectory
-                scan_directory_recursive(fullpath);
+                scan_directory_recursive(fullpath, warnings, warning_count);
             } else if (S_ISREG(st.st_mode)) {
                 const char* ext = strrchr(name, '.');
                 if (ext && strcmp(ext, ".c") == 0) {
-                    scan_file(fullpath);
+                    scan_file(fullpath, warnings, warning_count);
                 }
             }
         }
