@@ -11,6 +11,9 @@
 *.obj
 *.elf
 
+# Custom Ignores
+summary.json
+
 # Linker output
 *.ilk
 *.map
