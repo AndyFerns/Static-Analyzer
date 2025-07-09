@@ -2,8 +2,11 @@
 #include <sys/stat.h>
 #include "scanner.h"
 
+#define GREEN   "\033[1;32m"
+#define RESET   "\033[0m"
+
 int main(int argc, char* argv[]) {
-    printf("Simple Static Security Scanner for .c files\n");
+    printf(GREEN "🔐 Simple Static Security Scanner for .c files\n" RESET);
 
     if (argc < 2) {
         printf("Usage: %s <file_or_directory_to_scan>\n", argv[0]);
@@ -17,7 +20,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (path_stat.st_mode & S_IFDIR) {
-        scan_directory(argv[1]);
+        scan_directory_recursive(argv[1]);
     } else if (path_stat.st_mode & S_IFREG) {
         scan_file(argv[1]);
     } else {
