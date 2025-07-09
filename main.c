@@ -54,7 +54,7 @@ void save_as_csv(Warning* warnings, int count) {
 }
 
 int main(int argc, char* argv[]) {
-    printf(GREEN "🔐 Simple Static Security Scanner for .c files\n" RESET);
+    printf(GREEN "Simple Static Security Scanner for .c files\n" RESET);
 
     if (argc < 2) {
         printf("Usage: %s <target> [--summary] [--output json|csv]\n", argv[0]);
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (summary_mode) {
-        printf("\n🧾 Total warnings: %d\n", warning_count);
+        printf("\nTotal warnings: %d\n", warning_count);
     }
 
     if (output_json)
